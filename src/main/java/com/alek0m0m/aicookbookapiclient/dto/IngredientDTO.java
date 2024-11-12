@@ -1,7 +1,6 @@
 package com.alek0m0m.aicookbookapiclient.dto;
 
 
-import com.alek0m0m.aicookbookapiclient.model.Ingredient;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,12 +21,4 @@ public class IngredientDTO {
     private String unit;
 
 
-    public Ingredient toEntity() {
-        Ingredient ingredient = new Ingredient();
-        ingredient.setId(getId());
-        ingredient.setName(getName());
-        ingredient.setAmount(getAmount());
-        ingredient.setUnit(getUnit());
-        return ingredient;
-    }
 }
