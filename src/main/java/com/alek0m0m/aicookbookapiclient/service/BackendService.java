@@ -1,17 +1,17 @@
 package com.alek0m0m.aicookbookapiclient.service;
 
-import com.alek0m0m.aicookbookapiclient.dto.ChatRequest;
-import com.alek0m0m.aicookbookapiclient.dto.ChatResponse;
-import com.alek0m0m.aicookbookapiclient.dto.RecipeDTO;
-import com.alek0m0m.aicookbookapiclient.dto.Message;
+import com.alek0m0m.aicookbookapiclient.dto.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,10 +22,12 @@ public class BackendService {
 
 
     private final WebClient webClient;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public BackendService(WebClient.Builder webClientBuilder) {
+    public BackendService(WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build();
+        this.objectMapper = objectMapper;
     }
 
     public Mono<RecipeDTO> getRecipeById(Long id) {
@@ -79,7 +81,19 @@ public class BackendService {
                 .bodyValue(chatRequest)
                 .retrieve()
                 .bodyToMono(ChatResponse.class)
-                .map(response -> response.getChoices().stream().map(choice -> new RecipeDTO(choice.getMessage().getContent()))
-                .collect(Collectors.toList()));
+                .flatMap(response -> {
+                    Choice firstChoice = Optional.ofNullable(response.getChoices().get(0)).orElse(null);
+                    return firstChoice != null ? Mono.just(parseRecipeFromContent(firstChoice.getMessage().getContent()))
+                            : Mono.empty();
+                });
+    }
+
+    private RecipeDTO parseRecipeFromContent(String content) {
+       try{
+           return objectMapper.readValue(content, RecipeDTO.class);
+       } catch (Exception e){
+           System.err.println("Error parsing recipe from content: " + e.getMessage());
+       }
+       return new RecipeDTO();
     }
 }
