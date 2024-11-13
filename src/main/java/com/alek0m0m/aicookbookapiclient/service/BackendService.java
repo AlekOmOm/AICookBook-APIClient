@@ -1,16 +1,24 @@
 package com.alek0m0m.aicookbookapiclient.service;
 
+import com.alek0m0m.aicookbookapiclient.dto.ChatRequest;
+import com.alek0m0m.aicookbookapiclient.dto.ChatResponse;
 import com.alek0m0m.aicookbookapiclient.dto.RecipeDTO;
+import org.apache.logging.log4j.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BackendService {
+
+    @Value("${openai.api.key}")
+    private String apiKey;
 
 
     private final WebClient webClient;
@@ -40,5 +48,37 @@ public class BackendService {
                 .collectList();
 
         return recipes;
+    }
+
+    public Mono<RecipeDTO> generateRecipeFromIngredients(List<String> ingredients) {
+        String userIngredients = String.join(",", ingredients);
+        String promtMessage = String.format(
+                "I have these ingredients: %s. please provide recips i can make with only these ingredients. "
+                +" also, suggest recipes where i have at least 50% of the ingredients, and indicate which ingredients i am missing.",
+                userIngredients
+        );
+
+        ChatRequest chatRequest = new ChatRequest();
+        chatRequest.setModel("gpt-3.5-turbo"),
+        chatRequest.setMessages(List.of(
+                new Message("system", "you are a helpful recipe assistant."),
+                new Message("user", promtMessage)
+        ));
+        chatRequest.setN(3);
+        chatRequest.setTemperature(1);
+        chatRequest.setMaxTokens(150);
+        chatRequest.setPresencePenalty(1);
+
+        return WebClient.builder()
+                .baseUrl("http://api.openai.com/v1/chat/completions")
+                .build()
+                .post()
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(headers -> headers.setBearerAuth(apiKey))
+                .bodyValue(chatRequest)
+                .retrieve()
+                .bodyToMono(ChatResponse.class)
+                .map(response -> response.getChoices().stream().map(choice -> new RecipeDTO(choice.getMessage().getContent())))
+                .collect(Collectors.toList());
     }
 }
