@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
+import com.alek0m0m.aicookbookapiclient.Command.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -83,17 +83,12 @@ public class BackendService {
                 .bodyToMono(ChatResponse.class)
                 .flatMap(response -> {
                     Choice firstChoice = Optional.ofNullable(response.getChoices().get(0)).orElse(null);
-                    return firstChoice != null ? Mono.just(parseRecipeFromContent(firstChoice.getMessage().getContent()))
-                            : Mono.empty();
+                    String content = firstChoice.getMessage().getContent();
+
+                    ParseRecipeCommand parseCommand = new ParseRecipeCommand(content);
+                    return Mono.just(parseCommand.execute());
                 });
     }
 
-    private RecipeDTO parseRecipeFromContent(String content) {
-       try{
-           return objectMapper.readValue(content, RecipeDTO.class);
-       } catch (Exception e){
-           System.err.println("Error parsing recipe from content: " + e.getMessage());
-       }
-       return new RecipeDTO();
-    }
+
 }
