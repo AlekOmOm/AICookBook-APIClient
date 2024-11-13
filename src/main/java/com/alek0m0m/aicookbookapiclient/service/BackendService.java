@@ -3,7 +3,7 @@ package com.alek0m0m.aicookbookapiclient.service;
 import com.alek0m0m.aicookbookapiclient.dto.ChatRequest;
 import com.alek0m0m.aicookbookapiclient.dto.ChatResponse;
 import com.alek0m0m.aicookbookapiclient.dto.RecipeDTO;
-import org.apache.logging.log4j.message.Message;
+import com.alek0m0m.aicookbookapiclient.dto.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -59,11 +59,12 @@ public class BackendService {
         );
 
         ChatRequest chatRequest = new ChatRequest();
-        chatRequest.setModel("gpt-3.5-turbo"),
+        chatRequest.setModel("gpt-3.5-turbo");
         chatRequest.setMessages(List.of(
                 new Message("system", "you are a helpful recipe assistant."),
                 new Message("user", promtMessage)
         ));
+
         chatRequest.setN(3);
         chatRequest.setTemperature(1);
         chatRequest.setMaxTokens(150);
@@ -78,7 +79,7 @@ public class BackendService {
                 .bodyValue(chatRequest)
                 .retrieve()
                 .bodyToMono(ChatResponse.class)
-                .map(response -> response.getChoices().stream().map(choice -> new RecipeDTO(choice.getMessage().getContent())))
-                .collect(Collectors.toList());
+                .map(response -> response.getChoices().stream().map(choice -> new RecipeDTO(choice.getMessage().getContent()))
+                .collect(Collectors.toList()));
     }
 }
