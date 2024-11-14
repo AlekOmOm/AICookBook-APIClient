@@ -23,12 +23,12 @@ public class WebClientController {
     }
 
     @GetMapping("/{id}")
-    public Mono<RecipeDTO> getRecipeById(Long id) {
+    public Mono<RecipeDTO> getRecipeById(@PathVariable("id") Long id) {
         // Calls the BackendService to get a recipe by its ID and returns the result as a Mono<RecipeDTO>
         return backendService.getRecipeById(id);
     }
 
-    @PostMapping("/generate")
+    @PostMapping("/generate-recipe")
     public Mono<RecipeDTO> generateRecipeFromIngredients(@RequestBody List<String> ingredients) {
         return backendService.generateRecipeFromIngredients(ingredients);
     }
