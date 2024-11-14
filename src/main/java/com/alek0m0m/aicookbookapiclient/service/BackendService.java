@@ -23,7 +23,7 @@ public class BackendService {
     public Mono<RecipeDTO> getRecipeById(Long id) {
         Mono<RecipeDTO> recipeMono = webClient
                 .get()
-                .uri("/recipes/" + id)
+                .uri("/recipes" + id)
                 .retrieve()
                 .bodyToMono(RecipeDTO.class);
 
