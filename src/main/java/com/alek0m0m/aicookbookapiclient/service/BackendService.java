@@ -52,6 +52,11 @@ public class BackendService {
         return recipes;
     }
 
+
+    /*
+    String.join joiner listen med ingredienser til en komma separeret string.
+    String.format laver en message til AI.
+     */
     public Mono<RecipeDTO> generateRecipeFromIngredients(List<String> ingredients) {
         String userIngredients = String.join(",", ingredients);
         String promtMessage = String.format(
@@ -60,6 +65,10 @@ public class BackendService {
                 userIngredients
         );
 
+        /*
+        Specifisere versionen af ChatGPT og tilføjer 2 beskeder, en system prmt som giver context
+        og en user promt til recipe request.
+         */
         ChatRequest chatRequest = new ChatRequest();
         chatRequest.setModel("gpt-3.5-turbo");
         chatRequest.setMessages(List.of(
@@ -67,11 +76,28 @@ public class BackendService {
                 new Message("user", promtMessage)
         ));
 
+
+        /*
+        Beder om 3 completions, sætter randomnes i chattens response,
+        sætter en limmit på lænden af den response den giver,
+        PresencePenalty er til hvis der er repeated ingredienser
+         */
         chatRequest.setN(3);
         chatRequest.setTemperature(1);
         chatRequest.setMaxTokens(150);
         chatRequest.setPresencePenalty(1);
 
+
+        /*
+        Konfigurere en ny WebClient til OpenAI API endpoint.
+        Sætter HTTP metoden til POST.
+        Sætter JSON som request content typen.
+        Sætter chatRequest som body.
+        Executer request og mapper den response to ChatResponse.
+        Processere den response man har fået asynkront,
+            checker får null og retriever den første response,
+            extracter message content(recipe).
+         */
         return WebClient.builder()
                 .baseUrl("http://api.openai.com/v1/chat/completions")
                 .build()
@@ -85,6 +111,10 @@ public class BackendService {
                     Choice firstChoice = Optional.ofNullable(response.getChoices().get(0)).orElse(null);
                     String content = firstChoice.getMessage().getContent();
 
+
+                    /*
+                    Bruger en custom command til at parse content og returnere et RecipeDTO object
+                     */
                     ParseRecipeCommand parseCommand = new ParseRecipeCommand(content);
                     return Mono.just(parseCommand.execute());
                 });

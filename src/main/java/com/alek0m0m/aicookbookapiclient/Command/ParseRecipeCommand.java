@@ -13,6 +13,13 @@ public class ParseRecipeCommand implements Command<RecipeDTO> {
         this.objectMapper = new ObjectMapper();
     }
 
+
+    /*
+    initializer en empty RecipeDTO.
+    Parser content(JSON) til et RecipeDTO objekt. Hvis parsing går godt bliver resipeDTO fyldt op
+    med data fra content.
+    Returnere den parsed RecipeDTO
+     */
     @Override
     public RecipeDTO execute() {
         RecipeDTO recipeDTO = new RecipeDTO();
