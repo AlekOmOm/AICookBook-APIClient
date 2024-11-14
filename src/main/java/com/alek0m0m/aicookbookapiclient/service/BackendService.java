@@ -66,12 +66,7 @@ public class BackendService {
     String.format laver en message til AI.
      */
     public Mono<RecipeDTO> generateRecipeFromIngredients(List<String> ingredients) {
-        /*return getAllIngredients().defaultIfEmpty(List.of())
-                .flatMap(allIngredients -> {
 
-                    List<String> combinedIngredients = new ArrayList<>(allIngredients);
-                    combinedIngredients.addAll(ingredients);
-*/
                     String userIngredients = String.join(",", ingredients);
                     String promtMessage = String.format(
                             "I have these ingredients: %s. please provide recips i can make with only these ingredients. "
@@ -132,9 +127,6 @@ public class BackendService {
                                 ParseRecipeCommand parseCommand = new ParseRecipeCommand(content);
                                 return Mono.just(parseCommand.execute());
                             });
-
-  //              });
-
     }
 
 
