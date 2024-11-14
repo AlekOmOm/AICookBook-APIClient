@@ -66,16 +66,16 @@ public class BackendService {
     String.format laver en message til AI.
      */
     public Mono<RecipeDTO> generateRecipeFromIngredients(List<String> ingredients) {
-        return getAllIngredients().defaultIfEmpty(List.of())
+        /*return getAllIngredients().defaultIfEmpty(List.of())
                 .flatMap(allIngredients -> {
 
                     List<String> combinedIngredients = new ArrayList<>(allIngredients);
                     combinedIngredients.addAll(ingredients);
-
-                    String userIngredients = String.join(",", combinedIngredients);
+*/
+                    String userIngredients = String.join(",", ingredients);
                     String promtMessage = String.format(
                             "I have these ingredients: %s. please provide recips i can make with only these ingredients. "
-                                    +" also, suggest recipes where i have at least 50% of the ingredients, and indicate which ingredients i am missing.",
+                                    +" also, suggest recipes where i have at least 50 percent of the ingredients, and indicate which ingredients i am missing.",
                             userIngredients
                     );
 
@@ -133,7 +133,7 @@ public class BackendService {
                                 return Mono.just(parseCommand.execute());
                             });
 
-                });
+  //              });
 
     }
 

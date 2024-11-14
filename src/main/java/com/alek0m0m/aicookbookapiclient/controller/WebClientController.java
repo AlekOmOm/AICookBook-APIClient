@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,9 +29,16 @@ public class WebClientController {
         return backendService.getRecipeById(id);
     }
 
-    @PostMapping("/generate-recipe")
-    public Mono<RecipeDTO> generateRecipeFromIngredients(@RequestBody List<String> ingredients) {
-        return backendService.generateRecipeFromIngredients(ingredients);
+    @GetMapping("/generate-recipe")
+    public Mono<RecipeDTO> generateRecipeFromIngredients(/*@RequestBody List<String> ingredients*/) {
+
+        var ingredients =backendService.getAllIngredients();
+
+        List<String> combinedIngredients = new ArrayList<>(ingredients.block());
+        combinedIngredients.addAll(ingredients.block());
+
+
+        return backendService.generateRecipeFromIngredients(combinedIngredients);
     }
 
 }
