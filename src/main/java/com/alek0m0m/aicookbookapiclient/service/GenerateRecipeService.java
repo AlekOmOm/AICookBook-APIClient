@@ -18,10 +18,14 @@ import java.util.Optional;
 public class GenerateRecipeService {
 
     private final String API_KEY;
+    private final ParseResponseService parseResponseService;
 
     @Autowired
-    public GenerateRecipeService(Dotenv dotenv) {
+    public GenerateRecipeService(Dotenv dotenv, ParseResponseService parseResponseService) {
         this.API_KEY = dotenv.get("API_KEY");
+
+        System.out.println("API_KEY: " + API_KEY.substring(0,5));
+        this.parseResponseService = parseResponseService;
     }
 
     public Mono<String> genCopy (List < String > ingredients) {
@@ -111,9 +115,13 @@ public class GenerateRecipeService {
 
                     String content = firstChoice.getMessage().getContent();
 
-                    return Mono.just(new RecipeDTO()
+
+
+                    return Mono.just(parseResponseService.parseRecipe(content)
                     );
                 });
     }
+
+
 
 }
