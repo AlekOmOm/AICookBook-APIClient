@@ -22,8 +22,6 @@ public class GenerateRecipeService {
     @Autowired
     public GenerateRecipeService(Dotenv dotenv) {
         this.API_KEY = dotenv.get("API_KEY");
-
-        System.out.println("API_KEY: " + API_KEY.substring(0, 10));
     }
 
     public Mono<String> genCopy (List < String > ingredients) {
