@@ -2,6 +2,7 @@ package com.alek0m0m.aicookbookapiclient.controller;
 
 import com.alek0m0m.aicookbookapiclient.dto.RecipeDTO;
 import com.alek0m0m.aicookbookapiclient.service.BackendService;
+import com.alek0m0m.aicookbookapiclient.service.GenerateRecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -15,6 +16,9 @@ public class WebClientController {
 
     @Autowired
     BackendService backendService;
+
+    @Autowired
+    GenerateRecipeService generateRecipeService;
 
     @GetMapping("")
     public Mono<List<RecipeDTO>> getRecipes() {
@@ -32,13 +36,13 @@ public class WebClientController {
     @GetMapping("/generate-recipe")
     public Mono<RecipeDTO> generateRecipeFromIngredients(/*@RequestBody List<String> ingredients*/) {
 
-        var ingredients =backendService.getAllIngredients();
+        var ingredients =backendService.getAllIngredients().block();
 
-        List<String> combinedIngredients = new ArrayList<>(ingredients.block());
-        combinedIngredients.addAll(ingredients.block());
+        List<String> combinedIngredients = new ArrayList<>(ingredients);
+        combinedIngredients.addAll(ingredients);
 
 
-        return backendService.generateRecipeFromIngredients(combinedIngredients);
+        return generateRecipeService.generateRecipeFromIngredients(combinedIngredients);
     }
 
 }
