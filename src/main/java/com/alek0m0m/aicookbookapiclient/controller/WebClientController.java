@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/recipes")
 public class WebClientController {

@@ -1,5 +1,6 @@
 package com.alek0m0m.aicookbookapiclient.controller;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import com.alek0m0m.aicookbookapiclient.dto.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -16,12 +17,16 @@ import java.util.Map;
 @RestController
 public class ChatGPTController {
 
-    @Value("${OPENAI_APIKEY}")
-    private String openapiKey;
+    private String API_KEY;
 
     private final WebClient webClient;
 
-    public ChatGPTController(WebClient.Builder webClientBuilder) {
+    public ChatGPTController(Dotenv dotenv, WebClient.Builder webClientBuilder) {
+        this.API_KEY = dotenv.get("API_KEY");
+        if (API_KEY == null) {
+            throw new IllegalArgumentException("API_KEY is required");
+        } else { System.out.println("API_KEY: " + API_KEY.substring(0,5)); }
+
         this.webClient = webClientBuilder.baseUrl("https://api.openai.com/v1/chat/completions").build();
     }
 
@@ -35,13 +40,13 @@ public class ChatGPTController {
         chatRequest.setMessages(lstMessage);        // Setting the messages to the list in the chatRequest
         chatRequest.setN(1);                        // Setting the number of messages/completions to generate to 1
         chatRequest.setTemperature(0);              // Setting the sampling temperature to 0
-        chatRequest.setMaxtokens(30);               // Setting the maximum number of tokens to generate 10
+        chatRequest.setMaxTokens(30);               // Setting the maximum number of tokens to generate 10
         chatRequest.setStream(false);               // Setting whether to stream the results or not to false
         chatRequest.setPresencePenalty(1);          // Setting the presence penalty to 1
 
         ChatResponse response = webClient.post()
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(h -> h.setBearerAuth(openapiKey))
+                .headers(h -> h.setBearerAuth(API_KEY))
                 .bodyValue(chatRequest)
                 .retrieve()
                 .bodyToMono(ChatResponse.class)

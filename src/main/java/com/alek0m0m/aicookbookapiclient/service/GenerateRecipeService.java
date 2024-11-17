@@ -23,7 +23,6 @@ public class GenerateRecipeService {
     @Autowired
     public GenerateRecipeService(Dotenv dotenv, ParseResponseService parseResponseService) {
         this.API_KEY = dotenv.get("API_KEY");
-
         System.out.println("API_KEY: " + API_KEY.substring(0,5));
         this.parseResponseService = parseResponseService;
     }
