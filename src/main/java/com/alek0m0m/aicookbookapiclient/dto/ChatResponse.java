@@ -1,16 +1,27 @@
+
 package com.alek0m0m.aicookbookapiclient.dto;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
+
+import javax.annotation.processing.Generated;
+import java.awt.*;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+        "id",
+        "object",
+        "created",
+        "model",
+        "choices",
+        "usage"
+})
+@Generated("jsonschema2pojo")
 public class ChatResponse {
 
-    @JsonProperty ("id")
+    @JsonProperty("id")
     private String id;
     @JsonProperty("object")
     private String object;

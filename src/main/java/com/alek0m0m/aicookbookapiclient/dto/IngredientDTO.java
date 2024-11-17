@@ -1,17 +1,20 @@
 package com.alek0m0m.aicookbookapiclient.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import com.fasterxml.jackson.annotation.*;
-import lombok.*;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonDeserialize(as = IngredientDTO.class)
 @JsonPropertyOrder({
         "id",
         "name",
@@ -32,16 +35,5 @@ public class IngredientDTO {
     @JsonProperty("unit")
     private String unit;
 
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
 }

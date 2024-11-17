@@ -1,6 +1,9 @@
 package com.alek0m0m.aicookbookapiclient.dto;
 
 import com.fasterxml.jackson.annotation.*;
+import com.alek0m0m.aicookbookapiclient.dto.Message;
+
+import javax.annotation.processing.Generated;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +18,7 @@ import java.util.Map;
         "stream",
         "presence_penalty"
 })
-
-
-
+@Generated("jsonschema2pojo")
 public class ChatRequest {
 
     @JsonProperty("model")
@@ -78,13 +79,13 @@ public class ChatRequest {
     }
 
     @JsonProperty("max_tokens")
-    public Integer getMaxtokens() {
+    public Integer getMaxTokens() {
         return maxTokens;
     }
 
     @JsonProperty("max_tokens")
-    public void setMaxtokens(Integer max_tokens) {
-        this.maxTokens = max_tokens;
+    public void setMaxTokens(Integer maxTokens) {
+        this.maxTokens = maxTokens;
     }
 
     @JsonProperty("stream")
@@ -109,11 +110,12 @@ public class ChatRequest {
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
-        return additionalProperties;
+        return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
-        this.additionalProperties = additionalProperties;
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
     }
+
 }
