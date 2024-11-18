@@ -18,18 +18,18 @@ public class GenerateRecipeService {
     // Constants for Settings:
         // model options: gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-4, and gpt-3.5-turbo
     private static final String GPT_MODEL_NAME = "gpt-4o";
-    private static final double TEMPERATURE = 0.7;
+    private static final double TEMPERATURE = 1; // 0.5 - 1.0 (0.5 is more deterministic, 1.0 is more creative)
     private static final int MAX_TOKENS = 500;
     private static final double PRESENCE_PENALTY = 1;
 
     // Constants for Recipe Generation:
-    private static final int AMOUNT_OF_STORAGE_INGREDIENTS_IN_PROMPT = 3; // ingredients in prompt message
-    private static final String NUMBER_OF_RECIPES_TO_GENERATE = "2"; // recipes to generate
-    private static final int PERCENT_INGREDIENTS_FROM_STORAGE = 30; // % ingredients from storage
+    private static final int AMOUNT_OF_STORAGE_INGREDIENTS_IN_PROMPT = 4; // ingredients in prompt message
+    private static final String NUMBER_OF_RECIPES_TO_GENERATE = "1"; // recipes to generate
+    private static final int PERCENT_INGREDIENTS_FROM_STORAGE = 25; // % ingredients from storage
 
     //
         // note: static request limit (ie shared between all instances of this class)
-    private static final int REQUEST_LIMIT = 2; // 1 request per 10 seconds
+    private static final int REQUEST_LIMIT = 1; // 1 request per 10 seconds
     private static final int RECIPE_GENERATION_TIMEOUT = 10000; // 10 seconds
 
 
@@ -68,22 +68,12 @@ public class GenerateRecipeService {
         if (limitReached()) {
             return Mono.error(new RuntimeException("Limit reached"));
         }
-        if (ingredients == null || ingredients.isEmpty()) {
-            assert ingredients != null;
-            ingredients.addAll(List.of(
-                    new IngredientDTO(0L, "Onion", 1, "kg"),
-                    new IngredientDTO(0L, "Tomato", 1, "kg"),
-                    new IngredientDTO(0L, "Potato", 1, "kg")
-            ));
-        }
-        ingredients = ingredients.subList(0, AMOUNT_OF_STORAGE_INGREDIENTS_IN_PROMPT);
 
-        String userIngredients = ingredients.stream()
-                .map(IngredientDTO::getName)
-                .collect(Collectors.joining(","));
+        String promptMessage = createPromptMessage(getUserIngredients(ingredients));
 
-
-        String promptMessage = createPromptMessage(userIngredients);
+        System.out.println();
+        System.out.println("promptMessage: " + promptMessage);
+        System.out.println();
 
         ChatRequest chatRequest = new ChatRequest()
                 .setModel(GPT_MODEL_NAME)
@@ -95,8 +85,6 @@ public class GenerateRecipeService {
                 .setTemperature(TEMPERATURE)
                 .setMaxTokens(MAX_TOKENS)
                 .setPresencePenalty(PRESENCE_PENALTY);
-
-        // return Mono.just(recipeParser.parseRecipe()); // TODO remove this line later
 
         return WebClient.builder()
                 .baseUrl("https://api.openai.com/v1/chat/completions")
@@ -114,31 +102,76 @@ public class GenerateRecipeService {
                     );
                 });
 
-
     }
 
+    private String getUserIngredients(List<IngredientDTO> ingredients) {
+        if (ingredients == null || ingredients.isEmpty()) {
+            assert ingredients != null;
+            ingredients.addAll(List.of(
+                    new IngredientDTO(0L, "Onion", 1, "kg"),
+                    new IngredientDTO(0L, "Tomato", 1, "kg"),
+                    new IngredientDTO(0L, "Potato", 1, "kg")
+            ));
+        }
 
+        ingredients = getRandomIngredients(ingredients, AMOUNT_OF_STORAGE_INGREDIENTS_IN_PROMPT);
+
+        String userIngredients = ingredients.stream()
+                .map(IngredientDTO::getName)
+                .collect(Collectors.joining(","));
+        return userIngredients;
+    }
+
+    private List<IngredientDTO> getRandomIngredients(List<IngredientDTO> ingredients, int amountOfStorageIngredientsInPrompt) {
+        System.out.println();
+        System.out.println("getRandomIngredients");
+        System.out.println("ingredients: " + ingredients.size());
+
+        int[] randomIndices = new int[amountOfStorageIngredientsInPrompt];
+        List<Integer> prevInts = new java.util.ArrayList<>();
+        for (int i = 0; i < amountOfStorageIngredientsInPrompt; i++) {
+            int ival = (int) (Math.random() * ingredients.size());
+            if (prevInts.contains(ival)) {
+                i--;
+                continue;
+            } else {
+                prevInts.add(ival);
+                randomIndices[i] = ival;
+            }
+        }
+
+        List<IngredientDTO> randomIngredients = new java.util.ArrayList<>();
+        for (int randomIndex : randomIndices) {
+            randomIngredients.add(ingredients.get(randomIndex));
+        }
+        System.out.println("randomIngredients: " + randomIngredients.size());
+        System.out.println("randomIngredients: " + randomIngredients);
+        System.out.println();
+        return randomIngredients;
+    }
 
 
     private String createPromptMessage(String userIngredients) {
         return String.format(
-                "Optimize to use the Ingredients in Storage: %s. Provide " + NUMBER_OF_RECIPES_TO_GENERATE + " recipes. "
-                        + "At least " + PERCENT_INGREDIENTS_FROM_STORAGE + " percent of the Recipe ingredients must be from storage. "
-                        + "Respond precisely in JSON format of Recipe: "
+                "Input the following storage ingredients: %s. Please provide " + NUMBER_OF_RECIPES_TO_GENERATE + " creative recipes. "
+                        + "Create good creative Recipe use some ingredients from storage, but feel free to use ingredients I can go shop for. "
+                        + "The response must follow the JSON format for a Recipe as shown below: "
                         + "{"
-                            + "\"name\": \"Recipe Name\", "
-                            + "\"instructions\": \"Recipe instructions\", "
-                            + "\"ingredients\": ["
-                            + "    {"
-                            + "        \"id\": \"0\", "
-                            + "        \"name\": \"fx Onion\", "
-                            + "        \"amount\": \"int: value\", "
-                            + "        \"unit\": \"String: kg, g, l or ml\""
-                            + "    }"
-                            + "]"
+                        + "\"name\": \"Insert creative recipe name here (String)\", "
+                        + "\"instructions\": \"Detailed cooking instructions (String) \", "
+                        + "\"ingredients\": ["
+                        + "    {"
+                        + "        \"id\": \"0 (long) \", "
+                        + "        \"name\": \"Name of ingredient (String)\", "
+                        + "        \"amount\": \"Specify quantity here (Integer) \", "
+                        + "        \"unit\": \"Specify unit like kg, g, l or ml here (String)\""
+                        + "    }"
+                        + "]"
                         + "}",
                 "ingredients in storage: " +
                 userIngredients
+                + " be sure to use the correct data types for the values in the JSON format."
+                + " thanks for the help and be creative!"
         );
     }
 

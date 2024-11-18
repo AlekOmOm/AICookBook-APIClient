@@ -22,6 +22,7 @@ public class RecipeParser {
 
     public List<RecipeDTOSimple> parseRecipe(String content) {
         if (content == null) {
+            System.out.println("Content is null, using example content");
             content = parseResponseService.getExampleJSONContent();
         }
 

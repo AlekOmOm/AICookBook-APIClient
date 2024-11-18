@@ -39,13 +39,12 @@ public class WebClientController {
     }
 
     @GetMapping("/generate-recipe") // url: /api/recipes/generate-recipe
-    public Mono<List<RecipeDTO>> generateRecipeFromIngredients(/*@RequestBody List<String> ingredients*/) {
+    public Mono<List<RecipeDTO>> generateRecipeFromIngredients() {
         System.out.println();
         System.out.println("fetch /generate-recipe called");
         System.out.println();
-        List<IngredientDTO> combinedIngredients = backendService.getAllIngredients().block();
 
-        Mono<List<RecipeDTOSimple>> recipes =  generateRecipeService.generateRecipeFromIngredients(combinedIngredients);
+        Mono<List<RecipeDTOSimple>> recipes =  generateRecipeService.generateRecipeFromIngredients(backendService.getAllIngredients().block());
         debug(recipes);
 
         List<RecipeDTO> dtos = backendService.saveRecipes(recipes.block());
