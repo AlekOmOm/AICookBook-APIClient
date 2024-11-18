@@ -2,12 +2,14 @@ package com.alek0m0m.aicookbookapiclient.dto;
 
 import com.fasterxml.jackson.annotation.*;
 import com.alek0m0m.aicookbookapiclient.dto.Message;
+import lombok.ToString;
 
 import javax.annotation.processing.Generated;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "model",
@@ -28,13 +30,13 @@ public class ChatRequest {
     @JsonProperty("n")
     private Integer n;
     @JsonProperty("temperature")
-    private Integer temperature;
+    private Double temperature;
     @JsonProperty("max_tokens")
     private Integer maxTokens;
     @JsonProperty("stream")
     private Boolean stream;
     @JsonProperty("presence_penalty")
-    private Integer presencePenalty;
+    private Double presencePenalty;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
@@ -44,8 +46,9 @@ public class ChatRequest {
     }
 
     @JsonProperty("model")
-    public void setModel(String model) {
+    public ChatRequest setModel(String model) {
         this.model = model;
+        return this;
     }
 
     @JsonProperty("messages")
@@ -54,8 +57,9 @@ public class ChatRequest {
     }
 
     @JsonProperty("messages")
-    public void setMessages(List<Message> messages) {
+    public ChatRequest setMessages(List<Message> messages) {
         this.messages = messages;
+        return this;
     }
 
     @JsonProperty("n")
@@ -64,18 +68,20 @@ public class ChatRequest {
     }
 
     @JsonProperty("n")
-    public void setN(Integer n) {
+    public ChatRequest setN(Integer n) {
         this.n = n;
+        return this;
     }
 
     @JsonProperty("temperature")
-    public Integer getTemperature() {
+    public Double getTemperature() {
         return temperature;
     }
 
     @JsonProperty("temperature")
-    public void setTemperature(Integer temperature) {
+    public ChatRequest setTemperature(Double temperature) {
         this.temperature = temperature;
+        return this;
     }
 
     @JsonProperty("max_tokens")
@@ -84,8 +90,9 @@ public class ChatRequest {
     }
 
     @JsonProperty("max_tokens")
-    public void setMaxTokens(Integer maxTokens) {
+    public ChatRequest setMaxTokens(Integer maxTokens) {
         this.maxTokens = maxTokens;
+        return this;
     }
 
     @JsonProperty("stream")
@@ -99,13 +106,14 @@ public class ChatRequest {
     }
 
     @JsonProperty("presence_penalty")
-    public Integer getPresencePenalty() {
+    public Double getPresencePenalty() {
         return presencePenalty;
     }
 
     @JsonProperty("presence_penalty")
-    public void setPresencePenalty(Integer presencePenalty) {
+    public ChatRequest setPresencePenalty(Double presencePenalty) {
         this.presencePenalty = presencePenalty;
+        return this;
     }
 
     @JsonAnyGetter
@@ -114,8 +122,9 @@ public class ChatRequest {
     }
 
     @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
+    public ChatRequest setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+        return this;
     }
 
 }

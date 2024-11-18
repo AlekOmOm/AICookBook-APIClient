@@ -2,6 +2,7 @@
 package com.alek0m0m.aicookbookapiclient.dto;
 
 import com.fasterxml.jackson.annotation.*;
+import lombok.ToString;
 
 import javax.annotation.processing.Generated;
 import java.awt.*;
@@ -9,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "id",

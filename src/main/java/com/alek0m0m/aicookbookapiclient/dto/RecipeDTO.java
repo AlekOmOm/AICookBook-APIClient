@@ -3,12 +3,10 @@ package com.alek0m0m.aicookbookapiclient.dto;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -17,6 +15,7 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @JsonDeserialize(as = RecipeDTO.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -54,6 +53,9 @@ public class RecipeDTO {
 
     @JsonProperty("total_time")
     private int totalTime;
+
+    @JsonProperty("ingredients")
+    private List<IngredientDTO> ingredients;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<>();

@@ -50,14 +50,44 @@ public class BackendService {
         return recipes;
     }
 
-    public Mono<List<String>> getAllIngredients() {
+    public Mono<List<IngredientDTO>> getAllIngredients() {
         return webClient
                 .get()
                 .uri("/api/ingredients")
                 .retrieve()
-                .bodyToFlux(String.class)
+                .bodyToFlux(IngredientDTO.class)
                 .collectList();
     }
 
 
+    public List<RecipeDTO> saveRecipes(List<RecipeDTOSimple> recipes) {
+        for (RecipeDTOSimple recipe : recipes) {
+            webClient
+                    .post()
+                    .uri("/api/recipes")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Mono.just(recipe), RecipeDTOSimple.class)
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .block();
+        }
+        return getSavedRecipes(recipes);
+    }
+
+    private List<RecipeDTO> getSavedRecipes(List<RecipeDTOSimple> recipes) {
+        List<RecipeDTO> justSavedRecipes = new ArrayList<>();
+        List<RecipeDTO> savedRecipes = getAllRecipes().block();
+
+        for (RecipeDTOSimple recipe : recipes) {
+            Optional<RecipeDTO> savedRecipe = savedRecipes.stream()
+                    .filter(r -> r.getName().equals(recipe.getName()))
+                    .findFirst();
+            if (savedRecipe.isPresent()) {
+                justSavedRecipes.add(savedRecipe.get());
+            } else {
+                System.out.println("Recipe not saved: " + recipe.getName());
+            }
+        }
+        return justSavedRecipes;
+    }
 }
