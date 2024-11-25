@@ -172,6 +172,7 @@ public class GenerateRecipeService {
                 userIngredients
                 + " be sure to use the correct data types for the values in the JSON format."
                 + " thanks for the help and be creative!"
+                + " how much did this request and response cost?"
         );
     }
 
